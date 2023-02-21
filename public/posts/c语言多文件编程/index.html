@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html><head>
+<title>C语言多文件编程</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+      <script src="/js/toc.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+<link rel="stylesheet" href="/scss/journal.min.7c01e9f6fb2f6083d79d2f3a32ec6b7901e262e94a52a64a542aef98bc5bda64.css" integrity="sha256-fAHp9vsvYIPXnS86MuxreQHiYulKUqZKVCrvmLxb2mQ=" media="screen">
+
+
+
+<link rel="stylesheet" href="/scss/dark-mode.min.cb53f1bee2b8900cb4f082afbf00175d6618f281cf9a2fe8619e3b52d20b5721.css" integrity="sha256-y1PxvuK4kAy08IKvvwAXXWYY8oHPmi/oYZ47UtILVyE=" media="screen">
+
+
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Material+Icons">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div class="single-column-drawer-container" id="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#c%e8%af%ad%e8%a8%80%e5%a4%9a%e6%96%87%e4%bb%b6%e7%bc%96%e7%a8%8b-all-in-one" class="nav-c语言多文件编程-all-in-one">
+									C语言多文件编程 All in One!
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8a%a8%e6%80%81%e5%ba%93%e5%92%8c%e5%85%b1%e4%ba%ab%e5%ba%93" class="nav-动态库和共享库">
+									动态库和共享库
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#include%e6%98%af%e4%bb%80%e4%b9%88" class="nav-include是什么">
+									include是什么
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%9c%80%e8%a6%81include%e4%bf%9d%e6%8a%a4" class="nav-为什么需要include保护">
+									为什么需要include保护
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#ifndef%e6%96%b9%e5%bc%8f" class="nav-ifndef方式">
+									#ifndef方式
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#pragma-once%e6%96%b9%e5%bc%8f" class="nav-pragma-once方式">
+									#pragma once方式
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#makefile" class="nav-makefile">
+									makefile
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div id="drawer-mask" v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav id="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div id="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a id="navTitle" class="navbar-brand" href="https://breakinglead.github.io">
+            破碎千秋
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" id="darkModeToggleButton2">
+            <i class="material-icons" id="darkModeToggleIcon2">
+                dark_mode
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" id="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://breakinglead.github.io">
+        <div class="single-column-header-title">破碎千秋</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+                <div id="streamContainer" class="stream-container">
+
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    C语言多文件编程
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2023-02-22 03:11
+                        </time>
+                        
+
+                        
+
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>本文识别码为: 23B22-B:3</p>
+<h1 id="c语言多文件编程-all-in-one">C语言多文件编程 All in One!</h1>
+<h2 id="动态库和共享库">动态库和共享库</h2>
+<p>C语言中想要用库有两种形式，一种是动态库，一种是共享库。动态库常以<code>.so</code>（shared object）为后缀名，静态库常以<code>.a</code>（archive）为后缀名。
+一句话说明: 动态库是在编译后动态链接的，不占用可执行文件的空间，而且其代码可以随时更改而不用改源文件。
+静态库是编译的时候要打包到可执行文件中的，所以其可能会导致程序体积增大。
+但是，在用动态库的时候也需要在外部打包上。</p>
+<h2 id="include是什么">include是什么</h2>
+<p>#include 其实就是将那个头文件中的内容复制到本文件中。</p>
+<h2 id="为什么需要include保护">为什么需要include保护</h2>
+<p>有时候你include的那个文件中也引用了一个很常用的库，先暂且叫它<code>foo.h</code>但是你在你的<code>main.c</code>中也要用到这个<code>foo.h</code>，
+那么编译之后实际上就会<code>#include</code>两次这个<code>foo.h</code>，那就得用include保护了。现在一般有两种方式来include保护。</p>
+<h3 id="ifndef方式">#ifndef方式</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// in xxx.h
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#ifndef XXX_H
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#define XXX_H
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">// your code here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">#endif
+</span></span></span></code></pre></div><p>这种方式不言而喻，一目了然，<code>include</code>一次过后就不会执行代码了。</p>
+<h3 id="pragma-once方式">#pragma once方式</h3>
+<p>这种方式比较简单，在文件开头加上<code>#pragma once</code>就行。注意，不是所有编译器都支持，但是现在主流编译器都支持，比较方便，所以现在一般就可以用它了。</p>
+<h2 id="makefile">makefile</h2>
+
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2023-02-22</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts">
+			Next<br>No newer posts.
+                </a>
+                
+                
+                
+                <a class="older-posts" href="/posts/ast-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%E4%B9%8B%E4%B8%80%E4%BB%8E%E9%9B%B6%E5%85%A5%E9%97%A8/">
+			Previous<br>AST 抽象语法树（编译原理重要概念之一）从零入门
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+                    </div>
+            </div><div id="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://breakinglead.github.io">
+    
+        <div class="nav-title">
+            破碎千秋
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	2023 破碎千秋
+	
+
+    </div>
+    
+</div><div id="extraContainer" class="extra-container">
+    <div class="toc-wrapper">
+        
+
+        
+        <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#c%e8%af%ad%e8%a8%80%e5%a4%9a%e6%96%87%e4%bb%b6%e7%bc%96%e7%a8%8b-all-in-one" class="nav-c语言多文件编程-all-in-one">
+									C语言多文件编程 All in One!
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#%e5%8a%a8%e6%80%81%e5%ba%93%e5%92%8c%e5%85%b1%e4%ba%ab%e5%ba%93" class="nav-动态库和共享库">
+									动态库和共享库
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#include%e6%98%af%e4%bb%80%e4%b9%88" class="nav-include是什么">
+									include是什么
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%9c%80%e8%a6%81include%e4%bf%9d%e6%8a%a4" class="nav-为什么需要include保护">
+									为什么需要include保护
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								
+									<ul>
+								
+							
+						
+						
+							<li>
+								<a href="#ifndef%e6%96%b9%e5%bc%8f" class="nav-ifndef方式">
+									#ifndef方式
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#pragma-once%e6%96%b9%e5%bc%8f" class="nav-pragma-once方式">
+									#pragma once方式
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#makefile" class="nav-makefile">
+									makefile
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+        
+    </div>
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top"
+            :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a type="button" class="pagination-action" id="darkModeToggleButton">
+            <span class="material-icons pagination-action-icon" id="darkModeToggleIcon">
+                dark_mode
+            </span>
+        </a>
+        
+        
+    </div>
+</div><div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://risehere.net/">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	2023 破碎千秋
+	
+</div>
+            </div>
+    
+    <script src="/js/journal.js"></script></body>
+</html>
