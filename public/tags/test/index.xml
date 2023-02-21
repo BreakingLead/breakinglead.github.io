@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Test on 破碎千秋</title>
+    <link>https://breakinglead.github.io/tags/test/</link>
+    <description>Recent content in Test on 破碎千秋</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 07 Jan 2023 16:59:02 +0000</lastBuildDate><atom:link href="https://breakinglead.github.io/tags/test/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>First post (since 2017)</title>
+      <link>https://breakinglead.github.io/posts/first-post-since-2017/</link>
+      <pubDate>Sat, 07 Jan 2023 16:59:02 +0000</pubDate>
+      
+      <guid>https://breakinglead.github.io/posts/first-post-since-2017/</guid>
+      <description>第一篇文章。其实，我之前从2017年就弄过好几次Blog了，无一以失败告终，抱歉。现在是2023年。</description>
+    </item>
+    
+  </channel>
+</rss>

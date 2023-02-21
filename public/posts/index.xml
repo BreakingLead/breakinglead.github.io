@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on 破碎千秋</title>
+    <link>https://breakinglead.github.io/posts/</link>
+    <description>Recent content in Posts on 破碎千秋</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 22 Feb 2023 02:17:18 +0800</lastBuildDate><atom:link href="https://breakinglead.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Test</title>
+      <link>https://breakinglead.github.io/posts/test/</link>
+      <pubDate>Wed, 22 Feb 2023 02:17:18 +0800</pubDate>
+      
+      <guid>https://breakinglead.github.io/posts/test/</guid>
+      <description>HELLO! TEST this file</description>
+    </item>
+    
+    <item>
+      <title>First post (since 2017)</title>
+      <link>https://breakinglead.github.io/posts/first-post-since-2017/</link>
+      <pubDate>Sat, 07 Jan 2023 16:59:02 +0000</pubDate>
+      
+      <guid>https://breakinglead.github.io/posts/first-post-since-2017/</guid>
+      <description>第一篇文章。其实，我之前从2017年就弄过好几次Blog了，无一以失败告终，抱歉。现在是2023年。</description>
+    </item>
+    
+    <item>
+      <title>AST 抽象语法树（编译原理重要概念之一）从零入门</title>
+      <link>https://breakinglead.github.io/posts/ast-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%E4%B9%8B%E4%B8%80%E4%BB%8E%E9%9B%B6%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://breakinglead.github.io/posts/ast-%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91%E7%BC%96%E8%AF%91%E5%8E%9F%E7%90%86%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%E4%B9%8B%E4%B8%80%E4%BB%8E%E9%9B%B6%E5%85%A5%E9%97%A8/</guid>
+      <description>关键词：编译原理，抽象语法树，语言学（？）
+为啥看到的文章：https://github.com/DoctorWkt/acwj/tree/master/02_Parser
+编译原理好难（
+我发到了https://zhuanlan.zhihu.com/p/597338402上，懒得弄图了，想看图进这个。
+https://medium.com/basecs/leveling-up-ones-parsing-game-with-asts-d7a6fc2400ff
+抽象语法树从零入门（翻译） 在我开始学习计算机科学的旅程之前，有一些术语和短语让我想润到别的研究方向。
+但我并没有润，而是假装了解这些知识，在谈话中点头哈腰，假装我知道别人指的是什么，尽管事实是我根本不知道，而且当我听到那个超级可怕的计算机科学术语时，实际上已经完全糊涂了。在这个系列的过程中，我已经成功地覆盖了很多地方（指作者写的系列），其中许多术语实际上已经变得不那么可怕了！但是，有一个重要的术语&amp;hellip;&amp;hellip;还没有说道。
+不过，那个术语，我已经回避了一段时间了。直到现在，每当我听到这个术语时，我都会觉得人都麻了。它出现在闲聊中，有时也出现在会议的会谈中。每一次，我都会想到机器在转圈，电脑在吐出一串串无法解读的代码，只是我周围的人其实都能解读这些代码，所以实际上只有我不知道发生了什么（哎呀，怎么会这样！）。
+也许我不是唯一有这种感觉的人。但是，我想我应该告诉你这个术语到底是什么，对吗？好吧，准备好了，因为我指的是永远难以捉摸的、似乎令人困惑的抽象语法树，或者简称 AST。在被吓唬了许多年之后，我很高兴终于不再害怕这个术语，并真正理解它到底是什么。
+现在是时候直面抽象语法树的根源，并提高我们的 parse（解析） 水平了！
+从具体到抽象 每一个优秀的研究都是从一个坚实的基础开始的，而我们揭开这个结构的神秘面纱的任务也应该以完全相同的方式开始：当然是以一个定义开始的。
+抽象语法树实际上不过是解析树（就是指直接 tokenize 后解析得到的树）的一个简化、浓缩版本。在编译器设计中，AST 一词与语法树（Syntax Tree）可以互换使用。
+我们经常会把语法树（以及它们是如何构建的）与我们已经相当熟悉的对应的解析树相比较来思考。我们知道，解析树是包含我们代码语法结构的树状数据结构；换句话说，它们包含所有出现在代码 &amp;ldquo;句子 &amp;ldquo;中的句法信息，并直接从编程语言本身的语法中得到。
+另一方面，一个抽象的语法树忽略了大量的语法信息，但是解析树就会包含这些信息。
+相比之下，一个 AST 只包含与分析源文本有关的信息，而跳过任何其他在解析文本时使用的额外内容（例如什么分号，函数参数中的逗号之类的对程序没有意义的东西）。
+如果我们把注意力集中在 AST 的 &amp;ldquo;抽象性 &amp;ldquo;上，这种区别就开始变得更有意义了。
+我们记得，解析树是一个句子语法结构的图解版本。换句话说，我们可以说解析树完全代表了一个表达式、句子或文本的样子。它基本上是文本本身的直接翻译；我们把句子的每一小部分&amp;ndash;从标点符号到表达式再到标记&amp;ndash;都变成一个树形数据结构。它揭示了文本的具体语法，这就是为什么它也被称为具体语法树，或 CST（Concrete Syntax Tree）。我们用 &amp;ldquo;具体 &amp;ldquo;一词来描述这种结构，因为它是我们的代码的语法拷贝，以树状格式逐个标记。
+但是，是什么让一些东西变得具体而又抽象呢？好吧，抽象语法树并不像解析树那样向我们展示一个表达式的确切面貌。
+相反，抽象的语法树向我们展示了 &amp;ldquo;重要 &amp;ldquo;的部分&amp;ndash;那些我们真正关心的东西，它们赋予了我们的代码 &amp;ldquo;句子 &amp;ldquo;本身以意义。语法树向我们展示了一个表达式的重要部分，或者我们源文本的抽象语法。因此，与具体的语法树相比，这些结构是我们代码的抽象表示（在某些方面，不那么精确），这正是它们的名字的由来。
+既然我们已经了解了这两种数据结构的区别，以及它们表示代码的不同方式，那么就值得提出这样的问题：抽象语法树在编译器中的位置？首先，列出我们所知道的关于编译过程的一切。
+源文本-&amp;gt;扫描器（Scanner）-&amp;gt;Tokenizer-&amp;gt;解析器（Parser）
+假设我们有一个超级短小精悍的源文本，它看起来像这样。5 + (1 x 12). 我们记得，在编译过程中发生的第一件事是对文本进行扫描，这项工作由扫描器（Scanner）完成，其结果是文本被分解成其尽可能小的部分，这些部分被称为词素。这一部分将与语言无关，我们最终会得到我们源文本的剥离版本。 接下来，这些词素会被传递给词法/符号化器（Tokenizer/Lexer），它将我们源文本的这些小的表现形式转化为 token，这将是我们的语言所特有的。我们的 token 将看起来像这样。[5, +, (, 1, x, 12, )]. 扫描器和标记器的共同努力构成了编译的词法分析。 然后，一旦我们的输入被标记化，它所产生的标记就会被传递给我们的 Parser，然后它就会从源文本中构建一个解析树。下面的图例说明了我们的标记化代码在解析树格式中的样子。
+语法分析阶段生成解析树 将标记变成解析树的工作也被称为解析，被称为语法分析阶段。语法分析阶段直接依赖于 tokenize 阶段；因此，在编译过程中，tokenize 必须永远是第一位的，因为我们的编译器的解析器只有在 tokenizer 完成它的工作后才能完成它的工作!</description>
+    </item>
+    
+    <item>
+      <title>十六进制语</title>
+      <link>https://breakinglead.github.io/posts/%E9%80%A0%E8%AF%AD/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://breakinglead.github.io/posts/%E9%80%A0%E8%AF%AD/</guid>
+      <description>新人第一门造语，这个语言是一门带有一定屈折成分的分析语，是别的语言编译得到的怪东西，结构是 VSO ，灵感来源于 Lisp ，如有人类想要使用，后果自负。
+音系 元音 非常简单。
+1 [i] 2 [ɑ] a [a] 5 [u] e [ə][e][ɛ] 均可。 辅音 不区分大小写。
+3 [s] 4 不发音，作为零声母。或发成[ʔ]，为方便读写可以写成&#39; 6 [t] 7 [n]/[l] 8 [p] 9 [k] b [pʰ]/[b] c [kʰ]/[g] d [tʰ]/[d] 0 [ʲ] 但有特殊用途 f [ʷ] 但有特殊用途 结构 说真的，这语言无所谓结构不结构的，就跟 Lisp 一样，VSO。
+在严格模式下，这个语言的所有语素都是8位的，所以没有凑到8位需要用0f补齐。在宽松模式下随意。
+所有基本语素0开头f结尾，若不能凑成偶数则补一位f，此时它们不发音。
+将某语素内容取反码，f开头0结尾，与其后面加上 45 0f 0f 0f 是一样的。
+一个0f发音为[ju]，作为占位符使用。
+小品词 41 存在 4a 是 45 非，取反前面的词 4e 所属关系 40 左括号，用于标记从句等 4f 右括号 标点符号（均不读出） 4040 句号 404f 逗号 4f40 问号 4f4f 感叹号 某些例子 4a 05ef 0a7f 4040（宽）[ʔa we an] 4a0f0f0f 05ef0f0f 0a7f0f0f 40400f0f （严） 我是人。</description>
+    </item>
+    
+  </channel>
+</rss>
