@@ -20,4 +20,293 @@
 &lt;h3 id="pragma-once方式">#pragma once方式&lt;/h3>
 &lt;p>这种方式比较简单，在文件开头加上&lt;code>#pragma once&lt;/code>就行。注意，不是所有编译器都支持，但是现在主流编译器都支持，比较方便，所以现在一般就可以用它了。&lt;/p>
 &lt;h2 id="makefile">makefile&lt;/h2>
-- https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E5%A4%9A%E6%96%87%E4%BB%B6%E7%BC%96%E7%A8%8B/ -</description></item></channel></rss>
+- https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E5%A4%9A%E6%96%87%E4%BB%B6%E7%BC%96%E7%A8%8B/ -</description></item><item><title>C语言最简单二叉搜索树教程</title><link>https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E6%9C%80%E7%AE%80%E5%8D%95%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E6%95%99%E7%A8%8B/</link><pubDate>Wed, 22 Feb 2023 03:11:41 +0800</pubDate><guid>https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E6%9C%80%E7%AE%80%E5%8D%95%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E6%95%99%E7%A8%8B/</guid><description>破碎千秋 https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E6%9C%80%E7%AE%80%E5%8D%95%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E6%95%99%E7%A8%8B/ -&lt;p>本文识别码为: 23B22-B:4&lt;/p>
+&lt;h1 id="二叉搜索树binary-search-tree">二叉搜索树（Binary Search Tree）&lt;/h1>
+&lt;p>虽然我的文风很烂，但我保证这个二叉搜索树教程很容易看懂。&lt;/p>
+&lt;h2 id="前言">前言&lt;/h2>
+&lt;blockquote>
+&lt;p>二叉查找树是指一棵空树或者具有下列性质的二叉树：
+若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
+若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
+任意节点的左、右子树也分别为二叉查找树；
+&amp;ndash; Wikipedia&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="实现">实现&lt;/h2>
+&lt;h3 id="普通的二叉树">普通的二叉树&lt;/h3>
+&lt;p>首先要注明，二叉搜索树其实原理非常简单。
+我们先写个树的结构体。
+这里用 int 存了个值，其实在实际的生产中肯定不是 int 而是别的东西。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">typedef&lt;/span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">int&lt;/span> value;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> left;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> right;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} tree_node;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>由于 C 中所有类型都是值类型（学过 rust 的肯定会有体会的），所以存储另一个结构体只能用指针指向那个结构体的位置。&lt;/p>
+&lt;h4 id="创建节点的函数">创建节点的函数&lt;/h4>
+&lt;p>有了节点之后，我们需要用一个函数来自动创建节点，不然手动设置起来很麻烦。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">static&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#75715e">// malloc 是开辟内存用的，你如果不想用或者不会用也可以用全局变量之类的玩意
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> result &lt;span style="color:#f92672">=&lt;/span> (tree_node&lt;span style="color:#f92672">*&lt;/span>)&lt;span style="color:#a6e22e">malloc&lt;/span>(&lt;span style="color:#66d9ef">sizeof&lt;/span>(tree_node));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (result &lt;span style="color:#f92672">!=&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">=&lt;/span> value;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> result;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意这里的&lt;code>static&lt;/code>，其实就和其他语言中的&lt;code>private&lt;/code>差不多，如果函数被其修饰就意味着只能本文件中用，修饰变量其实还有点不一样，这个可以自行去查百科之类的。
+这个代码很简单，就是说如果成功申请了内存就把节点里的值赋下来，并让左右节点成为一个空指针并返回。&lt;/p>
+&lt;h4 id="打印树遍历树">打印树（遍历树）&lt;/h4>
+&lt;p>现在要是想测试的话，先拟一组数据（别忘了把 static 移掉，或者直接在一个文件里面写也可以）&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#75715e">// 1 代表左子树，2代表右子树，不过你想怎么命名也无所谓
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">11&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1_1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">12&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1_2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">13&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1_2_1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">14&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1_2_2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">15&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> a1_2_2_1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#ae81ff">16&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a1&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left &lt;span style="color:#f92672">=&lt;/span> a1_1;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a1&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right &lt;span style="color:#f92672">=&lt;/span> a1_2;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a1_2&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left &lt;span style="color:#f92672">=&lt;/span> a1_2_1;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a1_2&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right &lt;span style="color:#f92672">=&lt;/span> a1_2_2;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> a1_2_2&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left &lt;span style="color:#f92672">=&lt;/span> a1_2_2_1;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>然后我们来写一个前序遍历这个树的函数，这是一个递归函数。思路就是如果这个节点为空，那么我们就返回，不然就打印这个节点，并递归打印其左节点和右节点。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">// 打印layer个四空格缩进
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>&lt;span style="color:#66d9ef">static&lt;/span> &lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tab&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> layer)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span> i &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>; i &lt;span style="color:#f92672">&amp;lt;=&lt;/span> layer; i&lt;span style="color:#f92672">++&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34; &amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> layer)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tab&lt;/span>(layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;%d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> layer&lt;span style="color:#f92672">++&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right, layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left, layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>注意那个&lt;code>layer&lt;/code>每递归一层就加一，是为了缩进用的，这个不难看懂吧。打印出来后这个图要横着看，左边是左子树，右边是右子树。所以我是先打印右后打印左的。&lt;/p>
+&lt;p>输出:&lt;/p>
+&lt;pre tabindex="0">&lt;code>我稍微注释了一下，注意要横着看
+11
+13(right)
+15(right)
+--(right)
+16(left)
+14(left)
+12(left)
+&lt;/code>&lt;/pre>&lt;h3 id="二叉搜索树">二叉搜索树&lt;/h3>
+&lt;h4 id="插入节点">插入节点&lt;/h4>
+&lt;p>那么我们依照维基百科来实现插入节点的功能，首先分析思路:&lt;/p>
+&lt;ol>
+&lt;li>如果给定的树为空，那么直接新建一个节点插入就好。&lt;/li>
+&lt;li>如果给定的值等于树的根节点，那么直接返回无法插入。&lt;/li>
+&lt;li>如果给定的值小于根节点，那么把根节点的左节点看成根节点递归插入，直到节点为空后就能插进去了。&lt;/li>
+&lt;li>如果给定的值大于根节点，那么把根节点的右节点看成根节点递归插入，直到节点为空后就能插进去了。&lt;/li>
+&lt;/ol>
+&lt;p>非常简单对吧，但是注意，由于我们如果有个空节点，我们需要将其改写成有一个值的节点，所以我们传入的指针是一个双重指针，这样才能改变指向的那个节点指针指向的值，是不是绕晕了？没关系，你可以试着用单指针实现下面用注释括起来的部分，看看怎么实现比较好。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">// 注意，返回的是是否成功插入，bool 类型需要 #include&amp;lt;stdbool.h&amp;gt;才能用，不过返回int也可以。
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(tree_node&lt;span style="color:#f92672">**&lt;/span> to_root, &lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#75715e">//** */
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> root &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>to_root;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">*&lt;/span>to_root &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> true;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#75715e">//** */
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span> &lt;span style="color:#66d9ef">if&lt;/span> (value &lt;span style="color:#f92672">==&lt;/span> root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> false;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (value &lt;span style="color:#f92672">&amp;lt;&lt;/span> root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left), value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right), value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h4 id="寻找值是否在树中">寻找值是否在树中&lt;/h4>
+&lt;p>这个过程基本和上面一样，只是反过来而已，详见代码，不过这次我们不需要改写树，所以直接传根节点的指针就行。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">find_number&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) &lt;span style="color:#66d9ef">return&lt;/span> false;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">==&lt;/span> value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> true;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">&amp;gt;&lt;/span> value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">find_number&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left, value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">find_number&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right, value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="测试">测试&lt;/h3>
+&lt;p>那么你可以自行构建测试数据来进行测试。下面是我的测试，请自行比对结果，&lt;code>free()&lt;/code>函数是将&lt;code>malloc()&lt;/code>函数申请的空间还回去的。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;#34;binarytree.h&amp;#34;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> tree &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">5&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">2&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">8&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">7&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">1&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">4&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">14&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(tree, &lt;span style="color:#ae81ff">0&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;find 4 ?: %d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">find_number&lt;/span>(tree, &lt;span style="color:#ae81ff">4&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;find 11 ?: %d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">find_number&lt;/span>(tree, &lt;span style="color:#ae81ff">11&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">free&lt;/span>(tree);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">// Result:
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>&lt;span style="color:#75715e">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">5
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 8
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 14
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 7
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 2
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 4
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"> 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">find 4 ?: 1
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">find 11 ?: 0
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">*/&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="后记">后记&lt;/h2>
+&lt;p>这种二叉搜索树在数据一个比一个大的时候就变成链表了，查询时间最坏为 O(n)，所以还有一种东西叫做 AVL 树，其可以自动平衡，比如将那个链表的中间节点作为根节点，这样查起来快，下次我会讲。&lt;/p>
+&lt;h1 id="完整代码">完整代码&lt;/h1>
+&lt;p>文件: binarytree.h&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#ifndef BINARYTREE_H
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#define BINARYTREE_H
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdbool.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">typedef&lt;/span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">int&lt;/span> value;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> left;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">struct&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> right;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>} tree_node;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">static&lt;/span> &lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tab&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(tree_node&lt;span style="color:#f92672">**&lt;/span> to_root, &lt;span style="color:#66d9ef">int&lt;/span> value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">find_number&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#endif &lt;/span>&lt;span style="color:#75715e">// !BINARYTREE_H
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>文件: binarytree.c&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;#34;./binarytree.h&amp;#34;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">static&lt;/span> tree_node&lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> result &lt;span style="color:#f92672">=&lt;/span> (tree_node&lt;span style="color:#f92672">*&lt;/span>)&lt;span style="color:#a6e22e">malloc&lt;/span>(&lt;span style="color:#66d9ef">sizeof&lt;/span>(tree_node));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (result &lt;span style="color:#f92672">!=&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">=&lt;/span> value;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> result&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> result;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">static&lt;/span> &lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tab&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> layer)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span> i &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>; i &lt;span style="color:#f92672">&amp;lt;=&lt;/span> layer; i&lt;span style="color:#f92672">++&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34; &amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> layer)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tab&lt;/span>(layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;%d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> layer&lt;span style="color:#f92672">++&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right, layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left, layer);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(tree_node&lt;span style="color:#f92672">**&lt;/span> to_root, &lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> root &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>to_root;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">*&lt;/span>to_root &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">create_node&lt;/span>(value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> true;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (value &lt;span style="color:#f92672">==&lt;/span> root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> false;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (value &lt;span style="color:#f92672">&amp;lt;&lt;/span> root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left), value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right), value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">bool&lt;/span> &lt;span style="color:#a6e22e">find_number&lt;/span>(tree_node&lt;span style="color:#f92672">*&lt;/span> root, &lt;span style="color:#66d9ef">int&lt;/span> value)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root &lt;span style="color:#f92672">==&lt;/span> NULL) &lt;span style="color:#66d9ef">return&lt;/span> false;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">==&lt;/span> value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> true;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>value &lt;span style="color:#f92672">&amp;gt;&lt;/span> value) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">find_number&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>left, value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">else&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">find_number&lt;/span>(root&lt;span style="color:#f92672">-&amp;gt;&lt;/span>right, value);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>文件: main.c&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;#34;binarytree.h&amp;#34;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> tree_node&lt;span style="color:#f92672">*&lt;/span> tree &lt;span style="color:#f92672">=&lt;/span> NULL;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">5&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">2&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">8&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">7&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">1&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">4&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">insert_number&lt;/span>(&lt;span style="color:#f92672">&amp;amp;&lt;/span>tree, &lt;span style="color:#ae81ff">14&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">print_tree&lt;/span>(tree, &lt;span style="color:#ae81ff">0&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;find 4 ?: %d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">find_number&lt;/span>(tree, &lt;span style="color:#ae81ff">4&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;find 11 ?: %d&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">find_number&lt;/span>(tree, &lt;span style="color:#ae81ff">11&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">free&lt;/span>(tree);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>文件: makefile&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-makefile" data-lang="makefile">&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">main&lt;/span>&lt;span style="color:#f92672">:&lt;/span> main.o binarytree.o
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cc -o main main.o binarytree.o
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">main.o&lt;/span>&lt;span style="color:#f92672">:&lt;/span> main.c
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cc -c main.c
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">binarytree.o&lt;/span>&lt;span style="color:#f92672">:&lt;/span> binarytree.c
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cc -c binarytree.c
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">clear&lt;/span>&lt;span style="color:#f92672">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> rm *.o main
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">run&lt;/span>&lt;span style="color:#f92672">:&lt;/span> main
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ./main
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>- https://breakinglead.github.io/posts/c%E8%AF%AD%E8%A8%80%E6%9C%80%E7%AE%80%E5%8D%95%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E6%95%99%E7%A8%8B/ -</description></item></channel></rss>
