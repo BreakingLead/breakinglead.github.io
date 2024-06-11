@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+        <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+        
+        <meta name="robots" content="index,follow">
+        <meta name="googlebot" content="index,follow">
+
+        <meta name="google" content="nositelinkssearchbox">
+        <meta name="google" content="notranslate">
+        
+
+        
+
+
+
+        
+        <link href="https://breakinglead.github.io/style.css" rel="stylesheet" />
+        
+        <title>
+    C语言最简单二叉搜索树教程 - Shattered Memories
+</title>
+        </script>
+    </head>
+    <body>
+        <script>
+            function get_theme() {
+                return localStorage.getItem('prefers-color') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark')
+            }
+
+            /**
+             * This code is required here to avoid flickering the light theme when the dark theme is chosen.
+             */
+            function evaluate_prefers_color() {
+                const s = get_theme();
+                if (s === 'dark') {
+                    document.body.classList.add('dark');
+                } else if (s === 'light') {
+                    document.body.classList.remove('dark');
+                } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark');
+                }
+            }
+        </script>
+        
+    <main class="article-content">
+        <p><a href="..">..</a>/cyu-yan-zui-jian-dan-er-cha-sou-suo-shu-jiao-cheng</p>
+        
+        <h1>C语言最简单二叉搜索树教程</h1>
+        <p>Published: <time>2023-02-22T03:11:41+08:00</time></p>
+        
+        <hr />
+        <p>本文识别码为: 23B22-B:4</p>
+<h1 id="er-cha-sou-suo-shu-binary-search-tree">二叉搜索树（Binary Search Tree）</h1>
+<p>虽然我的文风很烂，但我保证这个二叉搜索树教程很容易看懂。</p>
+<h2 id="qian-yan">前言</h2>
+<blockquote>
+<p>二叉查找树是指一棵空树或者具有下列性质的二叉树：
+若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
+若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
+任意节点的左、右子树也分别为二叉查找树；
+-- Wikipedia</p>
+</blockquote>
+<h2 id="shi-xian">实现</h2>
+<h3 id="pu-tong-de-er-cha-shu">普通的二叉树</h3>
+<p>首先要注明，二叉搜索树其实原理非常简单。
+我们先写个树的结构体。
+这里用 int 存了个值，其实在实际的生产中肯定不是 int 而是别的东西。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">typedef struct</span><span> tree_node {
+</span><span>    </span><span style="color:#b48ead;">int</span><span>               value;
+</span><span>    </span><span style="color:#b48ead;">struct</span><span> tree_node* left;
+</span><span>    </span><span style="color:#b48ead;">struct</span><span> tree_node* right;
+</span><span>} tree_node;
+</span></code></pre>
+<p>由于 C 中所有类型都是值类型（学过 rust 的肯定会有体会的），所以存储另一个结构体只能用指针指向那个结构体的位置。</p>
+<h4 id="chuang-jian-jie-dian-de-han-shu">创建节点的函数</h4>
+<p>有了节点之后，我们需要用一个函数来自动创建节点，不然手动设置起来很麻烦。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">static</span><span> tree_node* </span><span style="color:#8fa1b3;">create_node</span><span>(</span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#65737e;">// malloc 是开辟内存用的，你如果不想用或者不会用也可以用全局变量之类的玩意
+</span><span>    tree_node* result = (tree_node*)</span><span style="color:#96b5b4;">malloc</span><span>(sizeof(tree_node));
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(result != </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        result-&gt;value = value;
+</span><span>        result-&gt;left  = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>        result-&gt;right = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">return</span><span> result;
+</span><span>}
+</span></code></pre>
+<p>注意这里的<code>static</code>，其实就和其他语言中的<code>private</code>差不多，如果函数被其修饰就意味着只能本文件中用，修饰变量其实还有点不一样，这个可以自行去查百科之类的。
+这个代码很简单，就是说如果成功申请了内存就把节点里的值赋下来，并让左右节点成为一个空指针并返回。</p>
+<h4 id="da-yin-shu-bian-li-shu">打印树（遍历树）</h4>
+<p>现在要是想测试的话，先拟一组数据（别忘了把 static 移掉，或者直接在一个文件里面写也可以）</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">int </span><span style="color:#8fa1b3;">main</span><span>()
+</span><span>{
+</span><span>  </span><span style="color:#65737e;">// 1 代表左子树，2代表右子树，不过你想怎么命名也无所谓
+</span><span>  tree_node* a1 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">11</span><span>);
+</span><span>  tree_node* a1_1 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">12</span><span>);
+</span><span>  tree_node* a1_2 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">13</span><span>);
+</span><span>  tree_node* a1_2_1 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">14</span><span>);
+</span><span>  tree_node* a1_2_2 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">15</span><span>);
+</span><span>  tree_node* a1_2_2_1 = </span><span style="color:#bf616a;">create_node</span><span>(</span><span style="color:#d08770;">16</span><span>);
+</span><span>  a1-&gt;left     = a1_1;
+</span><span>  a1-&gt;right    = a1_2;
+</span><span>  a1_2-&gt;left   = a1_2_1;
+</span><span>  a1_2-&gt;right  = a1_2_2;
+</span><span>  a1_2_2-&gt;left = a1_2_2_1;
+</span><span>}
+</span></code></pre>
+<p>然后我们来写一个前序遍历这个树的函数，这是一个递归函数。思路就是如果这个节点为空，那么我们就返回，不然就打印这个节点，并递归打印其左节点和右节点。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#65737e;">// 打印layer个四空格缩进
+</span><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">print_tab</span><span>(</span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">for </span><span>(</span><span style="color:#b48ead;">int</span><span> i = </span><span style="color:#d08770;">1</span><span>; i &lt;= layer; i++) {
+</span><span>        </span><span style="color:#96b5b4;">printf</span><span>(&quot;    &quot;);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">void </span><span style="color:#8fa1b3;">print_tree</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        </span><span style="color:#b48ead;">return</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#bf616a;">print_tab</span><span>(layer);
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, root-&gt;value);
+</span><span>    layer++;
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(root-&gt;right, layer);
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(root-&gt;left, layer);
+</span><span>}
+</span></code></pre>
+<p>注意那个<code>layer</code>每递归一层就加一，是为了缩进用的，这个不难看懂吧。打印出来后这个图要横着看，左边是左子树，右边是右子树。所以我是先打印右后打印左的。</p>
+<p>输出:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>我稍微注释了一下，注意要横着看
+</span><span>11
+</span><span>    13(right)
+</span><span>        15(right)
+</span><span>            --(right)
+</span><span>            16(left)
+</span><span>        14(left)
+</span><span>    12(left)
+</span><span>
+</span></code></pre>
+<h3 id="er-cha-sou-suo-shu">二叉搜索树</h3>
+<h4 id="cha-ru-jie-dian">插入节点</h4>
+<p>那么我们依照维基百科来实现插入节点的功能，首先分析思路:</p>
+<ol>
+<li>如果给定的树为空，那么直接新建一个节点插入就好。</li>
+<li>如果给定的值等于树的根节点，那么直接返回无法插入。</li>
+<li>如果给定的值小于根节点，那么把根节点的左节点看成根节点递归插入，直到节点为空后就能插进去了。</li>
+<li>如果给定的值大于根节点，那么把根节点的右节点看成根节点递归插入，直到节点为空后就能插进去了。</li>
+</ol>
+<p>非常简单对吧，但是注意，由于我们如果有个空节点，我们需要将其改写成有一个值的节点，所以我们传入的指针是一个双重指针，这样才能改变指向的那个节点指针指向的值，是不是绕晕了？没关系，你可以试着用单指针实现下面用注释括起来的部分，看看怎么实现比较好。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#65737e;">// 注意，返回的是是否成功插入，bool 类型需要 #include&lt;stdbool.h&gt;才能用，不过返回int也可以。
+</span><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">insert_number</span><span>(tree_node** </span><span style="color:#bf616a;">to_root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#65737e;">//** */
+</span><span>    tree_node* root = *to_root;
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        *to_root = </span><span style="color:#bf616a;">create_node</span><span>(value);
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">true</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#65737e;">//** */
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(value == root-&gt;value) {
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">false</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(value &lt; root-&gt;value) {
+</span><span>        </span><span style="color:#bf616a;">insert_number</span><span>(&amp;(root-&gt;left), value);
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        </span><span style="color:#bf616a;">insert_number</span><span>(&amp;(root-&gt;right), value);
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h4 id="xun-zhao-zhi-shi-fou-zai-shu-zhong">寻找值是否在树中</h4>
+<p>这个过程基本和上面一样，只是反过来而已，详见代码，不过这次我们不需要改写树，所以直接传根节点的指针就行。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">find_number</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">false</span><span>;
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root-&gt;value == value) {
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">true</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root-&gt;value &gt; value) {
+</span><span>        </span><span style="color:#bf616a;">find_number</span><span>(root-&gt;left, value);
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        </span><span style="color:#bf616a;">find_number</span><span>(root-&gt;right, value);
+</span><span>    }
+</span><span>}
+</span></code></pre>
+<h3 id="ce-shi">测试</h3>
+<p>那么你可以自行构建测试数据来进行测试。下面是我的测试，请自行比对结果，<code>free()</code>函数是将<code>malloc()</code>函数申请的空间还回去的。</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">#include </span><span>&lt;</span><span style="color:#a3be8c;">stdlib.h</span><span>&gt;
+</span><span>
+</span><span style="color:#b48ead;">#include </span><span>&quot;</span><span style="color:#a3be8c;">binarytree.h</span><span>&quot;
+</span><span>
+</span><span style="color:#b48ead;">int </span><span style="color:#8fa1b3;">main</span><span>()
+</span><span>{
+</span><span>    tree_node* tree = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">5</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">2</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">8</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">7</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">1</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">4</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">14</span><span>);
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(tree, </span><span style="color:#d08770;">0</span><span>);
+</span><span>
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">find 4   ?: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, </span><span style="color:#bf616a;">find_number</span><span>(tree, </span><span style="color:#d08770;">4</span><span>));
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">find 11  ?: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, </span><span style="color:#bf616a;">find_number</span><span>(tree, </span><span style="color:#d08770;">11</span><span>));
+</span><span>
+</span><span>    </span><span style="color:#96b5b4;">free</span><span>(tree);
+</span><span>    </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">0</span><span>;
+</span><span>}
+</span><span style="color:#65737e;">// Result:
+</span><span style="color:#65737e;">/*
+</span><span style="color:#65737e;">5
+</span><span style="color:#65737e;">    8
+</span><span style="color:#65737e;">        14
+</span><span style="color:#65737e;">        7
+</span><span style="color:#65737e;">    2
+</span><span style="color:#65737e;">        4
+</span><span style="color:#65737e;">        1
+</span><span style="color:#65737e;">find 4   ?: 1
+</span><span style="color:#65737e;">find 11  ?: 0
+</span><span style="color:#65737e;">*/
+</span></code></pre>
+<h2 id="hou-ji">后记</h2>
+<p>这种二叉搜索树在数据一个比一个大的时候就变成链表了，查询时间最坏为 O(n)，所以还有一种东西叫做 AVL 树，其可以自动平衡，比如将那个链表的中间节点作为根节点，这样查起来快，下次我会讲。</p>
+<h1 id="wan-zheng-dai-ma">完整代码</h1>
+<p>文件: binarytree.h</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">#ifndef</span><span> BINARYTREE_H
+</span><span style="color:#b48ead;">#define </span><span>BINARYTREE_H
+</span><span>
+</span><span style="color:#b48ead;">#include </span><span>&lt;</span><span style="color:#a3be8c;">stdbool.h</span><span>&gt;
+</span><span style="color:#b48ead;">#include </span><span>&lt;</span><span style="color:#a3be8c;">stdio.h</span><span>&gt;
+</span><span style="color:#b48ead;">#include </span><span>&lt;</span><span style="color:#a3be8c;">stdlib.h</span><span>&gt;
+</span><span>
+</span><span style="color:#b48ead;">typedef struct</span><span> tree_node {
+</span><span>    </span><span style="color:#b48ead;">int</span><span>               value;
+</span><span>    </span><span style="color:#b48ead;">struct</span><span> tree_node* left;
+</span><span>    </span><span style="color:#b48ead;">struct</span><span> tree_node* right;
+</span><span>} tree_node;
+</span><span>
+</span><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">print_tab</span><span>(</span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>);
+</span><span>
+</span><span style="color:#b48ead;">void </span><span style="color:#8fa1b3;">print_tree</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>);
+</span><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">insert_number</span><span>(tree_node** </span><span style="color:#bf616a;">to_root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>);
+</span><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">find_number</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>);
+</span><span>
+</span><span>
+</span><span style="color:#b48ead;">#endif  </span><span style="color:#65737e;">// !BINARYTREE_H
+</span><span>
+</span></code></pre>
+<p>文件: binarytree.c</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">#include </span><span>&quot;</span><span style="color:#a3be8c;">./binarytree.h</span><span>&quot;
+</span><span>
+</span><span style="color:#b48ead;">static</span><span> tree_node* </span><span style="color:#8fa1b3;">create_node</span><span>(</span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    tree_node* result = (tree_node*)</span><span style="color:#96b5b4;">malloc</span><span>(sizeof(tree_node));
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(result != </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        result-&gt;value = value;
+</span><span>        result-&gt;left  = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>        result-&gt;right = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">return</span><span> result;
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">static void </span><span style="color:#8fa1b3;">print_tab</span><span>(</span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">for </span><span>(</span><span style="color:#b48ead;">int</span><span> i = </span><span style="color:#d08770;">1</span><span>; i &lt;= layer; i++) {
+</span><span>        </span><span style="color:#96b5b4;">printf</span><span>(&quot;    &quot;);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">void </span><span style="color:#8fa1b3;">print_tree</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">layer</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        </span><span style="color:#b48ead;">return</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#bf616a;">print_tab</span><span>(layer);
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, root-&gt;value);
+</span><span>    layer++;
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(root-&gt;right, layer);
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(root-&gt;left, layer);
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">insert_number</span><span>(tree_node** </span><span style="color:#bf616a;">to_root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    tree_node* root = *to_root;
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) {
+</span><span>        *to_root = </span><span style="color:#bf616a;">create_node</span><span>(value);
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">true</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(value == root-&gt;value) {
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">false</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(value &lt; root-&gt;value) {
+</span><span>        </span><span style="color:#bf616a;">insert_number</span><span>(&amp;(root-&gt;left), value);
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        </span><span style="color:#bf616a;">insert_number</span><span>(&amp;(root-&gt;right), value);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#b48ead;">bool </span><span style="color:#8fa1b3;">find_number</span><span>(tree_node* </span><span style="color:#bf616a;">root</span><span>, </span><span style="color:#b48ead;">int </span><span style="color:#bf616a;">value</span><span>)
+</span><span>{
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root == </span><span style="color:#d08770;">NULL</span><span>) </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">false</span><span>;
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root-&gt;value == value) {
+</span><span>        </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">true</span><span>;
+</span><span>    }
+</span><span>    </span><span style="color:#b48ead;">if </span><span>(root-&gt;value &gt; value) {
+</span><span>        </span><span style="color:#bf616a;">find_number</span><span>(root-&gt;left, value);
+</span><span>    } </span><span style="color:#b48ead;">else </span><span>{
+</span><span>        </span><span style="color:#bf616a;">find_number</span><span>(root-&gt;right, value);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span>
+</span></code></pre>
+<p>文件: main.c</p>
+<pre data-lang="c" style="background-color:#2b303b;color:#c0c5ce;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#b48ead;">#include </span><span>&lt;</span><span style="color:#a3be8c;">stdlib.h</span><span>&gt;
+</span><span>
+</span><span style="color:#b48ead;">#include </span><span>&quot;</span><span style="color:#a3be8c;">binarytree.h</span><span>&quot;
+</span><span>
+</span><span style="color:#b48ead;">int </span><span style="color:#8fa1b3;">main</span><span>()
+</span><span>{
+</span><span>    tree_node* tree = </span><span style="color:#d08770;">NULL</span><span>;
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">5</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">2</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">8</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">7</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">1</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">4</span><span>);
+</span><span>    </span><span style="color:#bf616a;">insert_number</span><span>(&amp;tree, </span><span style="color:#d08770;">14</span><span>);
+</span><span>    </span><span style="color:#bf616a;">print_tree</span><span>(tree, </span><span style="color:#d08770;">0</span><span>);
+</span><span>
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">find 4   ?: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, </span><span style="color:#bf616a;">find_number</span><span>(tree, </span><span style="color:#d08770;">4</span><span>));
+</span><span>    </span><span style="color:#96b5b4;">printf</span><span>(&quot;</span><span style="color:#a3be8c;">find 11  ?: </span><span style="color:#d08770;">%d</span><span style="color:#96b5b4;">\n</span><span>&quot;, </span><span style="color:#bf616a;">find_number</span><span>(tree, </span><span style="color:#d08770;">11</span><span>));
+</span><span>
+</span><span>    </span><span style="color:#96b5b4;">free</span><span>(tree);
+</span><span>    </span><span style="color:#b48ead;">return </span><span style="color:#d08770;">0</span><span>;
+</span><span>}
+</span></code></pre>
+<p>文件: makefile</p>
+<pre data-lang="makefile" style="background-color:#2b303b;color:#c0c5ce;" class="language-makefile "><code class="language-makefile" data-lang="makefile"><span>
+</span><span style="color:#8fa1b3;">main</span><span>: </span><span style="color:#a3be8c;">main.o binarytree.o
+</span><span>	</span><span style="color:#bf616a;">cc -o</span><span> main main.o binarytree.o
+</span><span>
+</span><span style="color:#8fa1b3;">main.o</span><span>: </span><span style="color:#a3be8c;">main.c
+</span><span>	</span><span style="color:#bf616a;">cc -c</span><span> main.c
+</span><span>
+</span><span style="color:#8fa1b3;">binarytree.o</span><span>: </span><span style="color:#a3be8c;">binarytree.c
+</span><span>	</span><span style="color:#bf616a;">cc -c</span><span> binarytree.c
+</span><span>
+</span><span style="color:#8fa1b3;">clear</span><span>:
+</span><span>	</span><span style="color:#bf616a;">rm </span><span>*.o main
+</span><span>
+</span><span style="color:#8fa1b3;">run</span><span>: </span><span style="color:#a3be8c;">main
+</span><span>	</span><span style="color:#bf616a;">./main
+</span></code></pre>
+
+    </main>
+
+        <footer>
+            <hr text="&copy; Copyright 2024" />
+            <div class="footer-social-media">
+                <a id="toggle-theme"></a>
+                <a href="/tags">Tags</a>
+                
+                
+                    
+                    <a href="https://github.com/breakinglead" target="_blank">GitHub</a>
+                    
+                
+                    
+                    <a href="https://twitter.com/breaking_lead_g" target="_blank">Twitter</a>
+                    
+                
+                
+            </div>
+        </footer>
+    </body>
+
+    
+    <script>
+        function switch_language(e) {
+            window.location.href = `/${e.value === default_language ? '' : e.value}`
+        }
+
+        function redirect(u) {
+            window.location.href = u
+        }
+
+        function toggle_prefers_color() {
+            localStorage.setItem('prefers-color', get_theme() === 'dark' ? 'light' : 'dark');
+            evaluate_prefers_color();
+        }
+
+        function init_toggle_theme() {
+            const el = document.getElementById('toggle-theme')
+            const renderState = () => {
+                // Icons from https://fonts.google.com/icons
+                el.innerHTML = get_theme() === 'dark'
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M479.765 716Q538 716 579 675.235q41-40.764 41-99Q620 518 579.235 477q-40.764-41-99-41Q422 436 381 476.765q-41 40.764-41 99Q340 634 380.765 675q40.764 41 99 41Zm.235 60q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM70 606q-12.75 0-21.375-8.675Q40 588.649 40 575.825 40 563 48.625 554.5T70 546h100q12.75 0 21.375 8.675 8.625 8.676 8.625 21.5 0 12.825-8.625 21.325T170 606H70Zm720 0q-12.75 0-21.375-8.675-8.625-8.676-8.625-21.5 0-12.825 8.625-21.325T790 546h100q12.75 0 21.375 8.675 8.625 8.676 8.625 21.5 0 12.825-8.625 21.325T890 606H790ZM479.825 296Q467 296 458.5 287.375T450 266V166q0-12.75 8.675-21.375 8.676-8.625 21.5-8.625 12.825 0 21.325 8.625T510 166v100q0 12.75-8.675 21.375-8.676 8.625-21.5 8.625Zm0 720q-12.825 0-21.325-8.62-8.5-8.63-8.5-21.38V886q0-12.75 8.675-21.375 8.676-8.625 21.5-8.625 12.825 0 21.325 8.625T510 886v100q0 12.75-8.675 21.38-8.676 8.62-21.5 8.62ZM240 378l-57-56q-9-9-8.629-21.603.37-12.604 8.526-21.5 8.896-8.897 21.5-8.897Q217 270 226 279l56 57q8 9 8 21t-8 20.5q-8 8.5-20.5 8.5t-21.5-8Zm494 495-56-57q-8-9-8-21.375T678.5 774q8.5-9 20.5-9t21 9l57 56q9 9 8.629 21.603-.37 12.604-8.526 21.5-8.896 8.897-21.5 8.897Q743 882 734 873Zm-56-495q-9-9-9-21t9-21l56-57q9-9 21.603-8.629 12.604.37 21.5 8.526 8.897 8.896 8.897 21.5Q786 313 777 322l-57 56q-8 8-20.364 8-12.363 0-21.636-8ZM182.897 873.103q-8.897-8.896-8.897-21.5Q174 839 183 830l57-56q8.8-9 20.9-9 12.1 0 20.709 9Q291 783 291 795t-9 21l-56 57q-9 9-21.603 8.629-12.604-.37-21.5-8.526ZM480 576Z"/></svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M480 936q-150 0-255-105T120 576q0-150 105-255t255-105q8 0 17 .5t23 1.5q-36 32-56 79t-20 99q0 90 63 153t153 63q52 0 99-18.5t79-51.5q1 12 1.5 19.5t.5 14.5q0 150-105 255T480 936Zm0-60q109 0 190-67.5T771 650q-25 11-53.667 16.5Q688.667 672 660 672q-114.689 0-195.345-80.655Q384 510.689 384 396q0-24 5-51.5t18-62.5q-98 27-162.5 109.5T180 576q0 125 87.5 212.5T480 876Zm-4-297Z"/></svg>`
+                evaluate_prefers_color()
+            }
+            el.onclick = () => {
+                localStorage.setItem('prefers-color', get_theme() === 'dark' ? 'light' : 'dark');
+                renderState()
+            }
+            renderState()
+        }
+
+        init_toggle_theme()
+    </script>
+    
+</html>
