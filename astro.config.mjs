@@ -6,6 +6,6 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://breakinglead.github.io',
-	base: '/lead-blog',
+	base: '/',
 	integrations: [mdx(), sitemap()],
 });
