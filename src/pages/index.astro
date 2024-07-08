@@ -1,44 +1,10 @@
 ---
 import Sidebar from "../components/Sidebar.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import "../styles/global.css";
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<!-- <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} /> -->
-		<!-- Font -->
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/gh/satouriko/LxgwWenKai_Webfonts@v1.101/dist/LXGWWenKai-Regular.css"
-		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Wittgenstein:ital,wght@0,400..900;1,400..900&display=swap"
-			rel="stylesheet"
-		/>
-	</head>
-	<body>
-		<div id="columns">
-			<Sidebar />
-			<div id="main">
-				<h1>Shattered Memories</h1>
-				<p>If there's anything must to be remembered, it's here.</p>
-				<a href="/uwu">Link</a>
-			</div>
-		</div>
-	</body>
-</html>
-
-<style>
-	#columns {
-		display: flex;
-		overflow: clip;
-	}
-	#main {
-		padding: 2em;
-	}
-</style>
+<BaseLayout pageTitle="关于">
+	<p>Used to be.</p>
+</BaseLayout>

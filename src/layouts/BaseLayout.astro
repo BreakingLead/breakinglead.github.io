@@ -1,0 +1,71 @@
+---
+import Footer from "../components/Footer.astro";
+import Sidebar from "../components/Sidebar.astro";
+import "../styles/global.css";
+const { pageTitle } = Astro.props;
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} /> -->
+        <!-- Font -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/satouriko/LxgwWenKai_Webfonts@v1.101/dist/LXGWWenKai-Regular.css"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Wittgenstein:ital,wght@0,400..900;1,400..900&display=swap"
+            rel="stylesheet"
+        />
+        <title>{pageTitle}</title>
+    </head>
+    <body>
+        <div id="columns">
+            <div id="sidebar">
+                <Sidebar />
+            </div>
+            <div id="sidebar-placeholder"></div>
+            <div id="content">
+                <slot />
+                <Footer />
+            </div>
+        </div>
+    </body>
+
+    <style>
+        :root {
+            --sidebar-width: 20%;
+        }
+        #columns {
+            display: flex;
+            justify-content: start;
+        }
+        #sidebar {
+            position: fixed;
+            min-width: var(--sidebar-width);
+            width: var(--sidebar-width);
+        }
+        #sidebar-placeholder {
+            visibility: hidden;
+            box-sizing: border-box;
+            height: 100vh;
+            min-width: var(--sidebar-width);
+            width: var(--sidebar-width);
+        }
+        #content {
+            margin: 3em 1em;
+            padding: 0 10%;
+            overflow-y: auto;
+        }
+        #title {
+            text-align: center;
+        }
+    </style>
+</html>
