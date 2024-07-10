@@ -1,0 +1,24 @@
+---
+import type { MarkdownInstance } from "astro";
+import BlogPostLink from "@/components/BlogPostLink.astro";
+
+interface Props {
+    posts: MarkdownInstance<any>[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="flex flex-wrap">
+    {
+        posts.map((post) => (
+            <div class="m-3 w-64">
+                <BlogPostLink
+                    url={post.url}
+                    title={post.frontmatter.title}
+                    desc={post.frontmatter.description}
+                />
+            </div>
+        ))
+    }
+</div>

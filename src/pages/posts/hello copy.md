@@ -1,13 +1,13 @@
 ---
 layout: ../../layouts/MarkdownPostLayout.astro
-title: 'Hello World'
+title: 'Init'
 pubDate: 2024-07-08
-description: 'This is the first post of my new Astro blog.'
+description: 'Test'
 author: 'Lead'
 image:
     url: 'https://docs.astro.build/assets/rose.webp'
     alt: 'Logo'
-tags: ["another"]
+tags: ["test"]
 ---
 
 # Meow

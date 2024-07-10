@@ -1,5 +1,5 @@
 ---
-
+import { ModeToggle } from "./ThemeToggle";
 ---
 
 <aside id="bar">
@@ -8,14 +8,19 @@
         <br />
         <br />
         <a href="/"> <div>About Lead</div> </a>
-        <a href="/"> <div>Posts</div></a>
+        <a href="/posts"> <div>Posts</div></a>
         <a href="/links"> <div>Links</div></a>
-        <a href="/"> <div>Gallery</div></a>
-
-        <div class="spacer"></div>
+        <a href="/gallery"> <div>Gallery</div></a>
+        <a href="/tags"> <div>Tags</div></a>
     </div>
     <div id="bar-bottom">
-        <p>© 2024 Lead</p>
+        <p>
+            <a href="https://x.com/breaking_lead_g">twitter</a>
+            <a href="https://www.github.com/breakinglead">github</a>
+
+            &nbsp;
+            <ModeToggle client:load />
+        </p>
     </div>
 </aside>
 
@@ -46,6 +51,8 @@
         flex: 0 0 30px;
         text-align: right;
         padding: 0 1em;
+        justify-self: end;
+        max-height: 5rem;
     }
     #blog-name {
         text-align: center;

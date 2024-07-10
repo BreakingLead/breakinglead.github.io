@@ -1,0 +1,13 @@
+---
+import BlogPostLink from "@/components/BlogPostLink.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostLinks from "@/components/PostLinks.astro";
+
+const allPosts = await Astro.glob("../posts/*.md");
+const pageTitle = "Posts";
+---
+
+<BaseLayout pageTitle={pageTitle}>
+    <p>All of my recent posts.</p>
+    <PostLinks posts={allPosts} />
+</BaseLayout>
