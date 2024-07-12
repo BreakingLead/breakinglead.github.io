@@ -59,8 +59,10 @@ const { pageTitle } = Astro.props;
             <div id="sidebar">
                 <Sidebar />
             </div>
+
             <div id="sidebar-placeholder"></div>
-            <div id="content">
+
+            <div id="content" class="prose dark:prose-invert">
                 <slot />
                 <Footer />
             </div>
@@ -72,8 +74,11 @@ const { pageTitle } = Astro.props;
             --sidebar-width: 20%;
         }
         #columns {
-            display: flex;
-            justify-content: start;
+            width: 100%;
+            display: grid;
+            grid-template-columns: var(--sidebar-width) calc(
+                    100% - var(--sidebar-width)
+                );
         }
         #sidebar {
             position: fixed;
@@ -88,8 +93,11 @@ const { pageTitle } = Astro.props;
             width: var(--sidebar-width);
         }
         #content {
-            margin: 3em 1em;
-            padding: 0 10%;
+            min-width: 60%;
+            box-sizing: content-box;
+            justify-self: center;
+            margin: 0;
+            padding: 3em 0;
             overflow-y: auto;
         }
         #title {

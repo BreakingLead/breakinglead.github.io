@@ -1,8 +1,9 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostLinks from "@/components/PostLinks.astro";
 
-const allPosts = await Astro.glob("../posts/*.md");
+const allPosts = await getCollection("posts");
 const pageTitle = "Posts";
 ---
 

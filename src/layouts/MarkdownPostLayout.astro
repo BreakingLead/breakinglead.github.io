@@ -5,9 +5,11 @@ const { frontmatter } = Astro.props;
 ---
 
 <BaseLayout title={frontmatter.title}>
-    <slot />
+    <div>
+        <slot />
 
-    <pre>
+        <pre>
         Published on: {frontmatter.pubDate.toString().slice(0, 10)}       
-    </pre>
+        </pre>
+    </div>
 </BaseLayout>

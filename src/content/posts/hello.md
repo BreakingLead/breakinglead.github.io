@@ -1,16 +1,14 @@
 ---
-layout: ../../layouts/MarkdownPostLayout.astro
 title: 'Hello World'
 pubDate: 2024-07-08
 description: 'This is the first post of my new Astro blog.'
-author: 'Lead'
 image:
     url: 'https://docs.astro.build/assets/rose.webp'
     alt: 'Logo'
 tags: ["another"]
 ---
 
-# Meow
+# MeowWWW
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean consectetur lorem sed nulla placerat pharetra. Sed congue, mauris ut tempus porta, massa tortor vestibulum lorem, ac pulvinar ex magna eget lorem. Phasellus sollicitudin sit amet urna dapibus egestas. Praesent quis augue et dui hendrerit ultricies sed ut ante. Maecenas nec sagittis eros. Nam non maximus augue, a venenatis nunc. Suspendisse viverra lectus velit, id congue ligula varius vel. Aenean nec lobortis dui. Donec consectetur erat sed nulla viverra condimentum. Curabitur sed ultrices felis, eu cursus tellus. Donec et eleifend orci.
 

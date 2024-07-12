@@ -1,9 +1,7 @@
 ---
-layout: ../../layouts/MarkdownPostLayout.astro
 title: 'Init'
 pubDate: 2024-07-08
 description: 'Test'
-author: 'Lead'
 image:
     url: 'https://docs.astro.build/assets/rose.webp'
     alt: 'Logo'

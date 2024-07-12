@@ -1,25 +1,25 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import type { MarkdownInstance } from "astro";
-import PostLinks from "@/components/PostLinks.astro";
-
-interface Props {
-    posts: MarkdownInstance<any>[];
-}
+import PostLinks from "../../components/PostLinks.astro";
+import { getCollection } from "astro:content";
 
 export async function getStaticPaths(): Promise<any> {
-    const allPosts = await Astro.glob("../posts/*.md");
+    const allPosts = await getCollection("posts");
     const uniqueTags = [
-        ...new Set(allPosts.map((post) => post.frontmatter.tags).flat()),
+        ...new Set(
+            allPosts
+                .map((post) => post.data.tags)
+                .filter((post) => post !== null && post !== undefined)
+                .flat(),
+        ),
     ];
 
     return uniqueTags.map((tag) => {
         return {
             params: { tag },
             props: {
-                posts: allPosts.filter((post) =>
-                    post.frontmatter.tags?.includes(tag),
-                ),
+                posts: allPosts.filter((post) => post.data.tags?.includes(tag)),
             },
         };
     });
