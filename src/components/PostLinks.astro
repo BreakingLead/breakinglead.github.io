@@ -1,19 +1,30 @@
 ---
 import BlogPostLink from "@/components/BlogPostLink.astro";
+import { getCollection } from "astro:content";
+
+const blogEntries = await getCollection("posts");
+interface Props {
+    posts: typeof blogEntries;
+}
+
 const { posts } = Astro.props;
 ---
 
 <div class="flex flex-wrap">
     {
-        posts.map((post: any) => (
-            <div class="m-3 w-64">
-                <BlogPostLink
-                    url={`/posts/${post.slug}`}
-                    title={post.data.title}
-                    desc={post.data.description}
-                    date={post.data.pubDate}
-                />
-            </div>
-        ))
+        posts
+            .toSorted(
+                (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+            )
+            .map((post) => (
+                <div class="m-3 w-64">
+                    <BlogPostLink
+                        url={`/posts/${post.slug}`}
+                        title={post.data.title}
+                        desc={post.data.description}
+                        date={post.data.pubDate}
+                    />
+                </div>
+            ))
     }
 </div>
