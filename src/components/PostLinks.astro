@@ -1,7 +1,5 @@
 ---
-import type { MarkdownInstance } from "astro";
 import BlogPostLink from "@/components/BlogPostLink.astro";
-
 const { posts } = Astro.props;
 ---
 
@@ -13,6 +11,7 @@ const { posts } = Astro.props;
                     url={`/posts/${post.slug}`}
                     title={post.data.title}
                     desc={post.data.description}
+                    date={post.data.pubDate}
                 />
             </div>
         ))

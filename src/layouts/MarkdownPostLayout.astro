@@ -2,14 +2,23 @@
 import BaseLayout from "./BaseLayout.astro";
 
 const { frontmatter } = Astro.props;
+const title = frontmatter.title ?? "Untitled";
+console.log(title);
 ---
 
-<BaseLayout title={frontmatter.title}>
+<BaseLayout pageTitle={title}>
     <div>
-        <slot />
+        <div id="post-content">
+            <slot />
+        </div>
 
         <pre>
         Published on: {frontmatter.pubDate.toString().slice(0, 10)}       
         </pre>
     </div>
 </BaseLayout>
+
+<script>
+    import pangu from "pangu";
+    pangu.spacingElementById("post-content");
+</script>
