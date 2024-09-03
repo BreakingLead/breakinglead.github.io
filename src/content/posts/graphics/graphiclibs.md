@@ -5,8 +5,6 @@ description: 'OpenGL 等库都是干什么的'
 tags: ["programming", "cg"]
 ---
 
-# Libraries
-
 OpenGL：老牌API，基于状态机。简单易学但是已经不更新了。之后或许会被淘汰。
 
 WebGL：OpenGL 的一个子集的Javascript API。

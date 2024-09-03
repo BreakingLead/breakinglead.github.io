@@ -7,20 +7,32 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-const { title, url, desc, date } = Astro.props;
+
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    post: CollectionEntry<"posts">;
+}
+
+const { post } = Astro.props;
 ---
 
 <div class="not-prose">
     <Card>
         <CardHeader>
             <CardTitle>
-                <a href={url} class="text-pink-500 hover:underline">{title}</a>
+                <a
+                    href={`posts/${post.slug}`}
+                    class="text-pink-500 hover:underline">{post.data.title}</a
+                >
             </CardTitle>
         </CardHeader>
         <CardContent>
-            <p>{desc}</p>
+            <p>{post.data.description ?? "No description"}</p>
             <pre
-                class="text-right">{date.toString().slice(0,10)}</pre></CardContent
-        >
+                class="text-right">
+                {post.data.pubDate.toLocaleDateString()}
+            </pre>
+        </CardContent>
     </Card>
 </div>

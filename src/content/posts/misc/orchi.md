@@ -2,9 +2,6 @@
 title: '自切教程'
 pubDate: 2024-07-17
 description: '嗯，你们喜欢的自切教程。'
-image:
-    url: 'https://docs.astro.build/assets/rose.webp'
-    alt: 'Logo'
 tags: ["life"]
 ---
 

@@ -1,19 +1,24 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 
-const { frontmatter } = Astro.props;
-const title = frontmatter.title ?? "Untitled";
-console.log(title);
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+const c = await getCollection("posts");
+interface Props {
+    post: CollectionEntry<"posts">;
+}
+
+const { post } = Astro.props;
+const title = post.data.title ?? "Untitled";
 ---
 
 <BaseLayout pageTitle={title}>
     <div>
-        <div id="post-content">
-            <slot />
-        </div>
+        <slot />
 
-        <pre>
-        Published on: {frontmatter.pubDate.toString().slice(0, 10)}       
-        </pre>
+        <div class="text-right text-red-500">
+            Published on: {post.data.pubDate.toLocaleDateString()}
+        </div>
     </div>
 </BaseLayout>

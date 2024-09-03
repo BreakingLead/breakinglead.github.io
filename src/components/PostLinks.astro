@@ -16,14 +16,12 @@ const { posts } = Astro.props;
             .toSorted(
                 (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
             )
+            .filter((entry) => {
+                return !entry.data.draft;
+            })
             .map((post) => (
-                <div class="m-3 w-64">
-                    <BlogPostLink
-                        url={`/posts/${post.slug}`}
-                        title={post.data.title}
-                        desc={post.data.description}
-                        date={post.data.pubDate}
-                    />
+                <div class="m-3 w-full">
+                    <BlogPostLink post={post} />
                 </div>
             ))
     }
