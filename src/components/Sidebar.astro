@@ -13,13 +13,11 @@ import { ModeToggle } from "./ThemeToggle";
         <a href="/gallery"> <div>Gallery</div></a>
         <a href="/tags"> <div>Tags</div></a>
     </div>
-    <div id="bar-bottom">
-        <p>
-            &nbsp;
-            <ModeToggle client:load />
-            <a href="https://x.com/breaking_lead_g">twitter</a>
-            <a href="https://www.github.com/breakinglead">github</a>
-        </p>
+    <div id="bar-bottom" class="inline-flex justify-around">
+        &nbsp;
+        <ModeToggle client:load />
+        <a href="https://x.com/breaking_lead_g">twitter</a>
+        <a href="https://www.github.com/breakinglead">github</a>
     </div>
 </aside>
 
@@ -67,6 +65,6 @@ import { ModeToggle } from "./ThemeToggle";
         backdrop-filter: blur(6px);
     }
     a div {
-        padding: 5px 1.5em;
+        padding: 5px 4em;
     }
 </style>
