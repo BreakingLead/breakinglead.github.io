@@ -1,7 +1,11 @@
 ---
+import { ModeToggle } from "@/components/ModeToggle";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import "../styles/global.css";
 import { Content } from "./index_content.mdx";
 ---
 
-<BaseLayout pageTitle="Index"> <Content /></BaseLayout>
+<BaseLayout pageTitle="Index">
+    <p class="dark:bg-red-600 bg-blue-500 p-1">Where am I?</p>
+    <Content />
+</BaseLayout>

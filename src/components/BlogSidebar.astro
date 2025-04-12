@@ -1,0 +1,68 @@
+---
+import { ModeToggle } from "./ModeToggle";
+import "@/styles/global.css";
+import { AppSidebar } from "./AppSidebar.tsx";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./ui/sidebar";
+import { Home, Inbox, Calendar, Search, Settings } from "lucide-react";
+
+const items = [
+  {
+    title: "Home",
+    url: "#",
+    icon: Home,
+  },
+  {
+    title: "Inbox",
+    url: "#",
+    icon: Inbox,
+  },
+  {
+    title: "Calendar",
+    url: "#",
+    icon: Calendar,
+  },
+  {
+    title: "Search",
+    url: "#",
+    icon: Search,
+  },
+  {
+    title: "Settings",
+    url: "#",
+    icon: Settings,
+  },
+];
+---
+
+<!-- <aside id="bar">
+    <div id="bar-content">
+        <a href="/" id="blog-name"> Shattered Memories </a>
+        <br />
+        <br />
+        <a href="/"> <div>About Lead</div> </a>
+        <a href="/posts"> <div>Posts</div></a>
+        <a href="/links"> <div>Links</div></a>
+        <a href="/gallery"> <div>Gallery</div></a>
+        <a href="/tags"> <div>Tags</div></a>
+    </div>
+    <div id="bar-bottom" class="inline-flex justify-around">
+        &nbsp;
+        <ModeToggle client:load />
+        <a href="https://x.com/breaking_lead_g">twitter</a>
+        <a href="https://www.github.com/breakinglead">github</a>
+    </div>
+</aside> -->
+<AppSidebar client:load />
