@@ -101,8 +101,8 @@ export function AppSidebar() {
             <ul className="m-5 text-sm">
               {
                 contacts.map((item) => (
-                  <li>
-                    <a href={item.url} className="text-accent-foreground hover:bg-blue-200" target="_blank" rel="noopener noreferrer">
+                  <li key={item.title}>
+                    <a href={item.url} className="text hover:bg-blue-200" target="_blank" rel="noopener noreferrer">
                       {item.title}
                       &nbsp;&nbsp;
                       {item.desc}

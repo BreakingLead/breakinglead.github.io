@@ -17,7 +17,7 @@ interface Props {
 const { post } = Astro.props;
 ---
 
-<div class="not-prose">
+<!-- <div class="not-prose">
     <Card>
         <CardHeader>
             <CardTitle>
@@ -35,4 +35,11 @@ const { post } = Astro.props;
             </pre>
         </CardContent>
     </Card>
+</div> -->
+<div class="not-prose">
+    <a href={`/posts/${post.slug}`} class="text-pink-500 hover:underline">
+        {post.data.title + " " + post.data.pubDate.toLocaleDateString()}
+    </a>
+
+    <p>{post.data.description ?? "No description"}</p>
 </div>

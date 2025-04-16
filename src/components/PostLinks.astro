@@ -11,18 +11,21 @@ const { posts } = Astro.props;
 ---
 
 <div class="flex flex-wrap">
-    {
-        posts
-            .toSorted(
-                (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
-            )
-            .filter((entry) => {
-                return !entry.data.draft;
-            })
-            .map((post) => (
-                <div class="m-3 w-full">
-                    <BlogPostLink post={post} />
-                </div>
-            ))
-    }
+    <ul>
+        {
+            posts
+                .toSorted(
+                    (a, b) =>
+                        b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+                )
+                .filter((entry) => {
+                    return !entry.data.draft;
+                })
+                .map((post) => (
+                    <li class="m-3 w-full">
+                        <BlogPostLink post={post} />
+                    </li>
+                ))
+        }
+    </ul>
 </div>

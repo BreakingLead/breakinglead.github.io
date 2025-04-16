@@ -1,8 +1,9 @@
 ---
-title: '自切教程'
+title: '???'
 pubDate: 2024-07-17
-description: '嗯，你们喜欢的自切教程。'
+description: '???'
 tags: ["life"]
+hidden: true
 ---
 
 # Orchiectomy Tutorial
